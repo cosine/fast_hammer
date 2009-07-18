@@ -13,6 +13,7 @@
 
 #include "ruby.h"
 #include <sys/types.h>
+#include <stdint.h>
 
 typedef struct {
 	uint32_t state[5];
