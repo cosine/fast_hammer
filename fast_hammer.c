@@ -68,7 +68,7 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
   SHA1_CTX context, sub_context;
   uint8_t hash[20];
   uint32_t hammer;
-  char *sub_base_string = malloc(strlen(base_string) + 2);
+  char *sub_base_string;
 
   for (iter_character = 33; iter_character < 127; iter_character++) {
     context = *base_context;
@@ -77,7 +77,7 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
     SHA1_Finish(&context, hash);
     hammer = internal_fast_hammer(match_hash, hash, 20);
 
-    if (hammer <= *lowest_hammer) {
+    if (hammer < *lowest_hammer) {
       /* TODO check for words you can't say on television. */
       *lowest_hammer = hammer;
       free(*hammer_string);
@@ -85,14 +85,13 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
     }
 
     if (depth > 1) {
-      snprintf(sub_base_string, strlen(base_string) + 2, "%s%c",
-               base_string, iter_character);
+      asprintf(&sub_base_string, "%s%c", base_string, iter_character);
       multi_sha1_ripper(match_hash, sub_base_string, &sub_context,
                         hammer_string, lowest_hammer, depth - 1);
+      free(sub_base_string);
     }
   }
 
-  free(sub_base_string);
 }
 
 
@@ -114,7 +113,7 @@ VALUE meth_FastHammer_multi_sha1
   SHA1_CTX context, sub_context;
   uint32_t lowest_hammer;
   char *hammer_string;
-  char *sub_base_string = malloc(RSTRING_LEN(base_string) + 2);
+  char *sub_base_string;
   VALUE rc_hash;
 
   SHA1_Init(&context);
@@ -129,9 +128,10 @@ VALUE meth_FastHammer_multi_sha1
   /* get the base context for the string with space */
   SHA1_Update(&sub_context, (uint8_t *) " ", 1);
 
-  snprintf(sub_base_string, RSTRING_LEN(base_string) + 2, "%s ", hammer_string);
+  asprintf(&sub_base_string, "%s ", hammer_string);
   multi_sha1_ripper(match_hash, sub_base_string, &sub_context,
                     &hammer_string, &lowest_hammer, 5);
+  free(sub_base_string);
 
   rc_hash = rb_hash_new();
   rb_hash_aset(rc_hash, ID2SYM(rb_intern("best_string")),
