@@ -34,7 +34,8 @@ static long bits_in_byte[256] = {
 /*
  * internal_fast_hammer -- calculate hamming distance of two numbers.
  */
-long internal_fast_hammer (const char *a, const char *b, register long length)
+long internal_fast_hammer (const unsigned char *a, const unsigned char *b,
+        register long length)
 {
   register int i;
   register long hammer = 0;
@@ -50,12 +51,12 @@ long internal_fast_hammer (const char *a, const char *b, register long length)
  */
 VALUE meth_FastHammer_fast_hammer (VALUE self, VALUE a, VALUE b)
 {
-  return INT2FIX(internal_fast_hammer(StringValuePtr(a), StringValuePtr(b), 20));
+  return LONG2FIX(internal_fast_hammer(StringValuePtr(a), StringValuePtr(b), 20));
 }
 
 
 /*
- *
+ * { :best_string => 'blah blah blah blah ... abcde', :hamming_distance => 17, :interupted => false, :out_of_time => true, :last_suffix => 'xyzab' }
  */
 VALUE meth_FastHammer_low_hammer
     (VALUE self, VALUE match_hash, VALUE base_string, VALUE start_suffix,
