@@ -61,14 +61,13 @@ VALUE meth_FastHammer_fast_hammer (VALUE self, VALUE a, VALUE b)
  * multi_sha1_ripper -- recursive function to rip through the hashs.
  */
 void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
-        size_t max_size, const SHA1_CTX *base_context,
+        char *end_of_base_string, const SHA1_CTX *base_context,
         char *hammer_string, uint32_t *lowest_hammer, uint32_t depth)
 {
   uint8_t iter_character;
   SHA1_CTX context, sub_context;
   uint8_t hash[20];
   uint32_t hammer;
-  char *sub_base_string;
 
   for (iter_character = 33; iter_character < 127; iter_character++) {
     context = *base_context;
@@ -80,14 +79,15 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
     if (hammer < *lowest_hammer) {
       /* TODO check for words you can't say on television. */
       *lowest_hammer = hammer;
-      sprintf(hammer_string, "%s%c", base_string, iter_character);
+      strncpy(hammer_string, base_string, end_of_base_string - base_string);
+      hammer_string[end_of_base_string - base_string] = iter_character;
+      hammer_string[end_of_base_string - base_string + 1] = 0;
     }
 
     if (depth > 1) {
-      sub_base_string = base_string + max_size;
-      sprintf(sub_base_string, "%s%c", base_string, iter_character);
-      multi_sha1_ripper(match_hash, sub_base_string, max_size, &sub_context,
-                        hammer_string, lowest_hammer, depth - 1);
+      end_of_base_string[0] = iter_character;
+      multi_sha1_ripper(match_hash, base_string, end_of_base_string + 1,
+                        &sub_context, hammer_string, lowest_hammer, depth - 1);
     }
   }
 
@@ -104,7 +104,7 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
  * { :best_string => 'blah blah blah blah ... abcde', :hamming_distance => 17, :interupted => false, :out_of_time => true, :last_suffix => 'xyzab' }
  */
 VALUE meth_FastHammer_multi_sha1
-    (VALUE self, VALUE rb_match_hash, VALUE base_string, VALUE start_suffix,
+    (VALUE self, VALUE rb_match_hash, VALUE rb_base_string, VALUE start_suffix,
      VALUE end_suffix, VALUE max_time)
 {
   const uint8_t *match_hash = (uint8_t *) RSTRING_PTR(rb_match_hash);
@@ -113,29 +113,30 @@ VALUE meth_FastHammer_multi_sha1
   uint32_t lowest_hammer;
   char *hammer_string;
   size_t max_size;
-  char *sub_base_strings;
+  char *base_string;
   VALUE rc_hash;
 
   SHA1_Init(&context);
-  SHA1_Update(&context, (uint8_t *) RSTRING_PTR(base_string), RSTRING_LEN(base_string));
+  SHA1_Update(&context, (uint8_t *) RSTRING_PTR(rb_base_string), RSTRING_LEN(rb_base_string));
   sub_context = context;
 
   /* start with the base string */
   SHA1_Finish(&context, hash);
   lowest_hammer = internal_fast_hammer(match_hash, hash, 20);
 #define START_DEPTH (5)
-  max_size = RSTRING_LEN(base_string) + START_DEPTH + 2;
+  max_size = RSTRING_LEN(rb_base_string) + START_DEPTH + 2;
   hammer_string = malloc(max_size);
-  strcpy(hammer_string, StringValueCStr(base_string));
+  strcpy(hammer_string, StringValueCStr(rb_base_string));
 
   /* get the base context for the string with space */
   SHA1_Update(&sub_context, (uint8_t *) " ", 1);
 
-  sub_base_strings = malloc(max_size * START_DEPTH);
-  sprintf(sub_base_strings, "%s ", hammer_string);
-  multi_sha1_ripper(match_hash, sub_base_strings, max_size, &sub_context,
-                    hammer_string, &lowest_hammer, START_DEPTH);
-  free(sub_base_strings);
+  base_string = malloc(max_size);
+  sprintf(base_string, "%s ", hammer_string);
+  multi_sha1_ripper(match_hash, base_string,
+                    base_string + RSTRING_LEN(rb_base_string) + 1,
+                    &sub_context, hammer_string, &lowest_hammer, START_DEPTH);
+  free(base_string);
 
   rc_hash = rb_hash_new();
   rb_hash_aset(rc_hash, ID2SYM(rb_intern("best_string")),
