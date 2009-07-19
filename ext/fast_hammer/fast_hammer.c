@@ -61,8 +61,8 @@ VALUE meth_FastHammer_fast_hammer (VALUE self, VALUE a, VALUE b)
  * multi_sha1_ripper -- recursive function to rip through the hashs.
  */
 void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
-        const SHA1_CTX *base_context,
-        char **hammer_string, uint32_t *lowest_hammer, uint32_t depth)
+        size_t max_size, const SHA1_CTX *base_context,
+        char *hammer_string, uint32_t *lowest_hammer, uint32_t depth)
 {
   uint8_t iter_character;
   SHA1_CTX context, sub_context;
@@ -80,15 +80,14 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
     if (hammer < *lowest_hammer) {
       /* TODO check for words you can't say on television. */
       *lowest_hammer = hammer;
-      free(*hammer_string);
-      asprintf(hammer_string, "%s%c", base_string, iter_character);
+      sprintf(hammer_string, "%s%c", base_string, iter_character);
     }
 
     if (depth > 1) {
-      asprintf(&sub_base_string, "%s%c", base_string, iter_character);
-      multi_sha1_ripper(match_hash, sub_base_string, &sub_context,
+      sub_base_string = base_string + max_size;
+      sprintf(sub_base_string, "%s%c", base_string, iter_character);
+      multi_sha1_ripper(match_hash, sub_base_string, max_size, &sub_context,
                         hammer_string, lowest_hammer, depth - 1);
-      free(sub_base_string);
     }
   }
 
@@ -113,7 +112,8 @@ VALUE meth_FastHammer_multi_sha1
   SHA1_CTX context, sub_context;
   uint32_t lowest_hammer;
   char *hammer_string;
-  char *sub_base_string;
+  size_t max_size;
+  char *sub_base_strings;
   VALUE rc_hash;
 
   SHA1_Init(&context);
@@ -123,15 +123,19 @@ VALUE meth_FastHammer_multi_sha1
   /* start with the base string */
   SHA1_Finish(&context, hash);
   lowest_hammer = internal_fast_hammer(match_hash, hash, 20);
-  hammer_string = strdup(StringValueCStr(base_string));
+#define START_DEPTH (5)
+  max_size = RSTRING_LEN(base_string) + START_DEPTH + 2;
+  hammer_string = malloc(max_size);
+  strcpy(hammer_string, StringValueCStr(base_string));
 
   /* get the base context for the string with space */
   SHA1_Update(&sub_context, (uint8_t *) " ", 1);
 
-  asprintf(&sub_base_string, "%s ", hammer_string);
-  multi_sha1_ripper(match_hash, sub_base_string, &sub_context,
-                    &hammer_string, &lowest_hammer, 5);
-  free(sub_base_string);
+  sub_base_strings = malloc(max_size * START_DEPTH);
+  sprintf(sub_base_strings, "%s ", hammer_string);
+  multi_sha1_ripper(match_hash, sub_base_strings, max_size, &sub_context,
+                    hammer_string, &lowest_hammer, START_DEPTH);
+  free(sub_base_strings);
 
   rc_hash = rb_hash_new();
   rb_hash_aset(rc_hash, ID2SYM(rb_intern("best_string")),

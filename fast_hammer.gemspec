@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'fast_hammer'
-  s.version = "0.1.1"
+  s.version = "0.1.2"
   s.summary = "Library to win @EngineYard's contest"
   s.description = "Provides a C-based algorithm for quickly plowing through SHA1s and\ncalculating hamming distances.\n"
   s.author = "Michael H. Buselli"
