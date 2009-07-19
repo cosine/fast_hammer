@@ -22,6 +22,12 @@ Note that the SHA1 code used by fast_hammer is in the public domain.
 
 =======
 
+Installation:
+
+    gem install cosine-fast_hammer --source=http://gems.github.com/
+
+=======
+
 How to use:
 
 The main entry point to fast_hammer is FastHammer.multi_sha1:
