@@ -1,0 +1,56 @@
+"fast_hammer" is a fast hamming distance calculator and synchronous SHA1
+calculator for @engineyard's contest.
+
+License:  Before July 23, 2009 -- Use is restricted.  Only people with
+a Twitter account that tweet the following may use this software:
+
+    I'm using @cosine's fast_hammer for @engineyard's contest! http://tr.im/t35s
+
+By "use" you may run and modify the software, but you may not further
+distribute it except to those that qualify as above.
+
+Note that this software has been distributed to some people under an
+alternate license not discussed here.
+
+On and after July 23, 2009 -- Use is governed by a two-clause BSD
+license, which is not presently included to avoid confusion prior to
+July 23.  Those people licensed to use this software prior to July 23
+will have their licensed terms converted to the two-clause BSD license
+on this date.
+
+Note that the SHA1 code used by fast_hammer is in the public domain.
+
+=======
+
+How to use:
+
+The main entry point to fast_hammer is FastHammer.multi_sha1:
+
+    require 'fast_hammer'
+    require 'sha1'
+
+    FastHammer.multi_sha1(
+        SHA1.digest("string to compare hashed value to"),
+        "prefix string with up to 12 words @engineyard provides",
+        nil, nil, nil)
+        # Last 3 arguments are not presently implemented, so are
+        # ignored.
+
+    Return value is a Hash:
+        {
+          :best_string => "prefix string with up to 12 words @engineyard provides ab123",
+          :hamming_distance => 30
+        }
+        # The hash includes other key-value pairs that are non-sense
+        # until more of the program is implemented.
+
+The FastHammer.multi_sha1 method takes about 3 hours to complete on
+a 2.2 GHz CPU running OS X 10.4, where it was developed.  This
+corresponds to about 700,000 SHA1 and hamming distance calculations per
+second.
+
+Another entry point into fast_hammer is the FastHammer.fast_hammer
+method.  It just calculates the hamming distance between two hashes:
+
+    FastHammer.fast_hammer(SHA1.digest("a"), SHA1.digest("b"))
+    Return value is a Fixnum:  76
