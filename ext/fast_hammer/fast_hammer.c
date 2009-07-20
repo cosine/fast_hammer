@@ -121,7 +121,7 @@ VALUE meth_FastHammer_multi_sha1
   SHA1_Update(&context, (uint8_t *) RSTRING_PTR(rb_base_string), RSTRING_LEN(rb_base_string));
   sub_context = context;
 
-#define START_DEPTH (4)
+#define START_DEPTH (5)
   max_size = RSTRING_LEN(rb_base_string) + START_DEPTH + 2;
   hammer_string = malloc(max_size);
   base_string = malloc(max_size);
