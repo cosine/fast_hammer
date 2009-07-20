@@ -7,7 +7,9 @@ extension_name = 'fast_hammer'
 # The destination
 dir_config(extension_name)
 
-$objs = [ "fast_hammer.#{$OBJEXT}", "sha1.#{$OBJEXT}" ]
+$objs = [ "fast_hammer.#{$OBJEXT}" ]
+
+$CFLAGS = '-O3'
 
 # Do the work
 create_makefile(extension_name)

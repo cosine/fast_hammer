@@ -4,6 +4,7 @@
 
 #include "ruby.h"
 #include "sha1.h"
+#include "sha1.c"
 
 
 /*
@@ -120,18 +121,24 @@ VALUE meth_FastHammer_multi_sha1
   SHA1_Update(&context, (uint8_t *) RSTRING_PTR(rb_base_string), RSTRING_LEN(rb_base_string));
   sub_context = context;
 
+#define START_DEPTH (4)
+  max_size = RSTRING_LEN(rb_base_string) + START_DEPTH + 2;
+  hammer_string = malloc(max_size);
+  base_string = malloc(max_size);
+  if (hammer_string == NULL || base_string == NULL) {
+    rb_raise(rb_const_get(rb_cObject, rb_intern("NoMemoryError")),
+             "%s", "no memory for temporary strings");
+    return Qnil; /* should never see this */
+  }
+
   /* start with the base string */
   SHA1_Finish(&context, hash);
   lowest_hammer = internal_fast_hammer(match_hash, hash, 20);
-#define START_DEPTH (5)
-  max_size = RSTRING_LEN(rb_base_string) + START_DEPTH + 2;
-  hammer_string = malloc(max_size);
   strcpy(hammer_string, StringValueCStr(rb_base_string));
 
   /* get the base context for the string with space */
   SHA1_Update(&sub_context, (uint8_t *) " ", 1);
 
-  base_string = malloc(max_size);
   sprintf(base_string, "%s ", hammer_string);
   multi_sha1_ripper(match_hash, base_string,
                     base_string + RSTRING_LEN(rb_base_string) + 1,
