@@ -69,6 +69,7 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
   SHA1_CTX context, sub_context;
   uint8_t hash[20];
   uint32_t hammer;
+  VALUE yield_hash;
 
   for (iter_character = 33; iter_character < 127; iter_character++) {
     context = *base_context;
@@ -83,6 +84,15 @@ void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
       strncpy(hammer_string, base_string, end_of_base_string - base_string);
       hammer_string[end_of_base_string - base_string] = iter_character;
       hammer_string[end_of_base_string - base_string + 1] = 0;
+
+      if (rb_block_given_p()) {
+        yield_hash = rb_hash_new();
+        rb_hash_aset(yield_hash, ID2SYM(rb_intern("best_string")),
+                     rb_str_new2(hammer_string));
+        rb_hash_aset(yield_hash, ID2SYM(rb_intern("hamming_distance")),
+                     LONG2FIX(*lowest_hammer));
+        rb_yield(yield_hash);
+      }
     }
 
     if (depth > 1) {
