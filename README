@@ -59,6 +59,20 @@ The main entry point to fast_hammer is FastHammer.multi_sha1:
         # The hash includes other key-value pairs that are non-sense
         # until more of the program is implemented.
 
+    You can optionally pass FastHammer.multi_sha1 a block.  If you do
+    the block is yielded to with a similar hash to that as above
+    whenever there is a status update (i.e. a lower hamming distance has
+    been found):
+
+    FastHammer.multi_sha1(
+        SHA1.digest("string to compare hashed value to"),
+        "prefix string with up to 12 words @engineyard provides",
+        nil, nil, nil) \
+    do |update_hash|
+      puts "New best string: #{update_hash[:best_string]}"
+      puts "New best hammer: #{update_hash[:hamming_distance]}"
+    end
+
 The FastHammer.multi_sha1 method takes about 3 hours to complete on
 a 2.2 GHz CPU running OS X 10.4, where it was developed.  This
 corresponds to about 700,000 SHA1 and hamming distance calculations per
