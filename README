@@ -1,6 +1,15 @@
 "fast_hammer" is a fast hamming distance calculator and synchronous SHA1
 calculator for @engineyard's contest.
 
+The latest version runs just over 725,000 calculations per second on
+a single core of a 2.2 GHz Core Duo running OS X 10.4.
+
+If you have nvidia GPUs, you may be interested in using this instead:
+
+    http://forums.nvidia.com/index.php?showtopic=102349
+
+=======
+
 License:  Before July 23, 2009 -- Use is restricted.  Only people with
 a Twitter account that tweet the following may use this software:
 
