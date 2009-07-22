@@ -36,7 +36,7 @@ static long bits_in_byte[256] = {
 /*
  * internal_fast_hammer -- calculate hamming distance of two numbers.
  */
-uint32_t internal_fast_hammer (const uint8_t *a, const uint8_t *b,
+static inline uint32_t internal_fast_hammer (const uint8_t *a, const uint8_t *b,
         register uint32_t length)
 {
   register uint32_t i;
@@ -61,8 +61,9 @@ VALUE meth_FastHammer_fast_hammer (VALUE self, VALUE a, VALUE b)
 /*
  * multi_sha1_ripper -- recursive function to rip through the hashs.
  */
-void multi_sha1_ripper (const uint8_t *match_hash, const char *base_string,
-        char *end_of_base_string, const SHA1_CTX *base_context,
+static void multi_sha1_ripper (const uint8_t *match_hash,
+        const char *base_string, char *end_of_base_string,
+        const SHA1_CTX *base_context,
         char *hammer_string, uint32_t *lowest_hammer, uint32_t depth)
 {
   uint8_t iter_character;
