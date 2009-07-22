@@ -1,8 +1,8 @@
 "fast_hammer" is a fast hamming distance calculator and synchronous SHA1
 calculator for @engineyard's contest.
 
-The latest version runs just over 725,000 calculations per second on
-a single core of a 2.2 GHz Core Duo running OS X 10.4.
+The latest version runs over 830,000 calculations per second on a single
+core of a 2.2 GHz Core Duo running OS X 10.4.
 
 If you have nvidia GPUs, you may be interested in using this instead:
 
@@ -73,10 +73,8 @@ The main entry point to fast_hammer is FastHammer.multi_sha1:
       puts "New best hammer: #{update_hash[:hamming_distance]}"
     end
 
-The FastHammer.multi_sha1 method takes about 3 hours to complete on
-a 2.2 GHz CPU running OS X 10.4, where it was developed.  This
-corresponds to about 700,000 SHA1 and hamming distance calculations per
-second.
+The FastHammer.multi_sha1 method takes just under 3 hours to complete on
+a 2.2 GHz CPU running OS X 10.4, where it was developed.
 
 Another entry point into fast_hammer is the FastHammer.fast_hammer
 method.  It just calculates the hamming distance between two hashes:
