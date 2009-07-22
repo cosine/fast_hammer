@@ -1,3 +1,6 @@
+# Copyright (c) 2009, Michael H. Buselli
+# See LICENSE for details.
+
 Gem::Specification.new do |s|
   s.name = 'fast_hammer'
   s.version = "0.1.6"

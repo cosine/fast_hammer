@@ -1,15 +1,10 @@
-# Loads mkmf which is used to make makefiles for Ruby extensions
+# Copyright (c) 2009, Michael H. Buselli
+# See LICENSE for details.
+
 require 'mkmf'
 
-# Give it a name
 extension_name = 'fast_hammer'
-
-# The destination
 dir_config(extension_name)
-
 $objs = [ "fast_hammer.#{$OBJEXT}" ]
-
 $CFLAGS = '-O3'
-
-# Do the work
 create_makefile(extension_name)

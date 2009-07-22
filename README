@@ -10,24 +10,18 @@ If you have nvidia GPUs, you may be interested in using this instead:
 
 =======
 
-License:  Before July 23, 2009 -- Use is restricted.  Only people with
-a Twitter account that tweet the following may use this software:
+License:  Use is governed by a two-clause BSD license.  Please see the
+LICENSE file for details.
+
+Note that the SHA1 code used by fast_hammer is in the public domain.
+
+Prior to and during the contest, the license terms also required the
+following tweet to be made to give me attribution:
 
     I'm using @cosine's fast_hammer for @engineyard's contest! http://tr.im/t35s
 
-By "use" you may run and modify the software, but you may not further
-distribute it except to those that qualify as above.
-
-Note that this software has been distributed to some people under an
-alternate license not discussed here.
-
-On and after July 23, 2009 -- Use is governed by a two-clause BSD
-license, which is not presently included to avoid confusion prior to
-July 23.  Those people licensed to use this software prior to July 23
-will have their licensed terms converted to the two-clause BSD license
-on this date.
-
-Note that the SHA1 code used by fast_hammer is in the public domain.
+Since the close of the contest, only the two-clause BSD license terms
+are required.
 
 =======
 

@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2009, Michael H. Buselli
+ * See LICENSE for details.
+ *
  * Ruby module for winning EngineYard's programming contest.
  */
 
